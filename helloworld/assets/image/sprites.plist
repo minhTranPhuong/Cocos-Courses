@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>frames</key>
+		<dict>
+			<key>car-gb02f6e086_640.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,1015},{640,285}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{0,7},{640,285}}</string>
+				<key>sourceSize</key>
+				<string>{640,292}</string>
+			</dict>
+
+			<key>phone-gc72d2797a_640.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{444,1493},{259,522}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{87,62},{259,522}}</string>
+				<key>sourceSize</key>
+				<string>{431,640}</string>
+			</dict>
+
+			<key>png-g2b3cee4c5_640.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,1493},{443,251}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{83,122},{443,251}}</string>
+				<key>sourceSize</key>
+				<string>{640,425}</string>
+			</dict>
+
+			<key>water-g740f030e8_1920.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,0},{1522,1014}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{214,10},{1522,1014}}</string>
+				<key>sourceSize</key>
+				<string>{1920,1024}</string>
+			</dict>
+
+			<key>white-wings-g3da42f2e1_640.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,1301},{529,191}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{58,150},{529,191}}</string>
+				<key>sourceSize</key>
+				<string>{640,511}</string>
+			</dict>
+
+		</dict>
+
+		<key>metadata</key>
+		<dict>
+			<key>format</key>
+			<integer>2</integer>
+			<key>size</key>
+			<string>{2048,2048}</string>
+			<key>textureFileName</key>
+			<string>sprites.png</string>
+			</dict>
+		</dict>
+</plist>
