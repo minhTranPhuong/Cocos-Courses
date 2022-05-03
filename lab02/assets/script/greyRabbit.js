@@ -12,48 +12,46 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        _time : 0,
+        _jumpCount: 0,
         _Ystart: 0,
-        _Yend:0,
+        _Yend: 0,
         _state: "up",
-        blackGrabbit:{
+        _jumpLimit: 3,
+        blackGrabbit: {
             default: null,
-            type:cc.Component
+            type: cc.Component
         }
     },
 
     // LIFE-CYCLE CALLBACKS:
 
-    onLoad () {
+    onLoad() {
         this.node.active = false;
     },
 
-    start () {
+    start() {
         cc.log("Hmmm")
         this._Ystart = this.node.y;
         this._Yend = this.node.y + 49;
     },
 
-    update (dt) {
-        cc.log("update greyRabbit");
-        if(this._time == 3){
+    update(dt) {
+        cc.log("update grey Rabbit !!!");
+        if (this._jumpCount == this._jumpLimit) {
             this.enabled = false;
             this.blackGrabbit.node.active = true;
             return;
-        } 
-        if(this._state === "up")
-        {
-            if(this.node.y == this._Yend) this._state = "down";
-            this.node.y +=1;
         }
-        else{
-            if(this.node.y == this._Ystart)
-            {
+        if (this._state === "up") {
+            if (this.node.y == this._Yend) this._state = "down";
+            this.node.y += 1;
+        }
+        else {
+            if (this.node.y == this._Ystart) {
                 this._state = "up";
-                this._time++;
-            } 
-            this.node.y -=1;
+                this._jumpCount++;
+            }
+            this.node.y -= 1;
         }
     },
 });
-// 10 => 20 => 30 => 40 => 50

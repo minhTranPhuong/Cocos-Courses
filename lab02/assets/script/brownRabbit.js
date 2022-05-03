@@ -6,7 +6,8 @@ cc.Class({
         greyRabbit:{
             default: null,
             type: cc.Component
-        }
+        },
+        _moveLimit:100
     },
 
     onLoad () {
@@ -19,8 +20,8 @@ cc.Class({
     },
 
     update (dt) {
-        cc.log("update brownRabbit");
-        if(this.node.x <100){
+        cc.log("update brow Rabbit!!!");
+        if(this.node.x < this._moveLimit){
             this.node.angle -= 9;
             this.node.x+=3   
         }

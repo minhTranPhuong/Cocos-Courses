@@ -5,7 +5,8 @@ cc.Class({
         brownRabbit:{
             default: null,
             type: cc.Component
-        }
+        },
+        _moveLimit: 100
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -17,12 +18,12 @@ cc.Class({
     },
 
     update (dt) {
-        cc.log("white greyRabbit");
+        cc.log("update White Rabbit !!!");
         this.move();
     },
 
     move(){
-        if(this.node.x >= 100){
+        if(this.node.x >= this._moveLimit){
             this.enabled = false;
             this.brownRabbit.node.active = true;
         }

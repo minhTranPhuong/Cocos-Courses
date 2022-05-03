@@ -16,7 +16,8 @@ cc.Class({
         _oldScale: 0,
         _flip: false,
         _oldPosition: 0,
-        _move: false
+        _move: false,
+        _limitScale: 3
     },
 
     onLoad () {
@@ -30,8 +31,8 @@ cc.Class({
     },
 
     update(dt) {
-        cc.log("black greyRabbit");
-        if (this._timeScale < 3) {
+        cc.log("update black Rabbit !!!");
+        if (this._timeScale < this._limitScale) {
             this._timeScale += 0.01;
             this.node.scale = this._oldScale * this._timeScale;
         }
