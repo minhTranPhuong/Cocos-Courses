@@ -6,14 +6,16 @@ cc.Class({
     properties: {
         data: null,
         richText: cc.Component,
-        slider:cc.Component
+        slider:cc.Component,
+        _evtActiveForm:null
     },
 
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
         this.data = {email:"" , password:"" , numberPhone:""};
-        Emitter.instance.registerEvent("activeValidateForm", this.activeForm.bind(this));
+        this._evtActiveForm = this.activeForm.bind(this);
+        Emitter.instance.registerEvent(emitterName.activeValidateForm, this._evtActiveForm);
     },
 
     start () {
@@ -28,12 +30,12 @@ cc.Class({
         var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/; 
         if (!filter.test(edtEmail.string)) { 
             alert("email khong hợp lệ: example@gmail.com");
-            Emitter.instance.emit("activeBtnRegister",false)
+            Emitter.instance.emit(emitterName.activeBtnRegister,false)
             return false; 
         }
         else{ 
             cc.log("true")
-            Emitter.instance.emit("activeBtnRegister",true)
+            Emitter.instance.emit(emitterName.activeBtnRegister,true)
             return true; 
         } 
     },
@@ -53,8 +55,6 @@ cc.Class({
 
     submitButton(){
         this.loading();
-        Emitter.instance.emit("submitForm", this.data , this);
-        Emitter.instance.emit("activeBtn", true);
     },
 
     loading(){
@@ -65,10 +65,13 @@ cc.Class({
             this.slider.getComponent(cc.ProgressBar).progress += 0.01;
             if (this.slider.getComponent(cc.ProgressBar).progress >= 1) {
                 this.slider.getComponent(cc.ProgressBar).progress = 0;
+                Emitter.instance.emit(emitterName.submitForm, this.data , this);
+                Emitter.instance.emit(emitterName.activeBtn, true);
                 this.slider.node.active = false;
                 this.richText.node.active = false;
+                clearInterval(interval);
             }
-        }, 50)
+        }, 30)
     },
 
 

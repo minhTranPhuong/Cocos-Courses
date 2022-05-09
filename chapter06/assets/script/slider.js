@@ -16,7 +16,7 @@ cc.Class({
     },
 
     onChange(vl){
-        Emitter.instance.emit("changeSize" , vl.progress)
+        Emitter.instance.emit(emitterName.changeSize , vl.progress)
     }
 
     // update (dt) {},

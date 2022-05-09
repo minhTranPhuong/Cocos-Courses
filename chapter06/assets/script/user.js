@@ -5,13 +5,17 @@ cc.Class({
 
     properties: {
         checkbox: cc.Component,
+        _evtDelete: null,
+        _evtChangeSize : null
     },
 
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        Emitter.instance.registerEvent("deleteItem",this.deleteItem.bind(this));
-        Emitter.instance.registerEvent("changeSize",this.changeSize.bind(this));
+        this._evtDelete = this.deleteItem.bind(this);
+        this._evtChangeSize = this.changeSize.bind(this)
+        Emitter.instance.registerEvent(emitterName.deleteItem,this._evtDelete);
+        Emitter.instance.registerEvent(emitterName.changeSize,this._evtChangeSize);
     },
 
     changeSize(value){
@@ -19,15 +23,18 @@ cc.Class({
     },
 
     isCheck(){
-        Emitter.instance.emit("isChecked", this.checkbox.isChecked);
+        Emitter.instance.emit(emitterName.isChecked, this.checkbox.isChecked);
     },
 
     deleteItem(){
-        cc.log(this.checkbox);
         let check = this.checkbox || false;
         if(check.isChecked == true){
+            Emitter.instance.removeEvent(emitterName.deleteItem,this._evtDelete)
+            Emitter.instance.removeEvent(emitterName.changeSize,this._evtChangeSize)
             this.node.parent.removeChild(this.node)
             this.node.destroy();
+            this.destroy();
+            cc.log(this.node);
         }
     },
 

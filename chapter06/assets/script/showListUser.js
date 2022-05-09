@@ -5,7 +5,8 @@ cc.Class({
 
     properties: {
         itemUser: cc.Prefab,
-        _loginCom: null
+        _loginCom: null,
+        _evtGetInfoUser:null,
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -18,11 +19,12 @@ cc.Class({
     },
 
     start () {
+        this._evtGetInfoUser = this.getInfoUser.bind(this);  
         this.enabled = false;
     },
 
     onDisable(){
-        Emitter.instance.registerEvent("showListUser", this.getInfoUser.bind(this))
+        Emitter.instance.registerEvent(emitterName.showListUser, this._evtGetInfoUser)
     },
 
     getInfoUser(data , loginCom){

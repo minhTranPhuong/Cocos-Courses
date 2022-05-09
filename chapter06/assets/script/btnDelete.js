@@ -4,13 +4,17 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        _countCheck:0
+        _countCheck:0,
+        _evtActiveNode: null,
+        _evtIsCheck: null,
     },
 
     onLoad () {
-        Emitter.instance.registerEvent("activeBtn",this.activeNode.bind(this));
-        Emitter.instance.registerEvent("activeValidateForm", this.activeNode.bind(this));
-        Emitter.instance.registerEvent("isChecked", this.isCheck.bind(this));
+        this._evtActiveNode = this.activeNode.bind(this)
+        this._evtIsCheck = this.isCheck.bind(this)
+        Emitter.instance.registerEvent(emitterName.activeBtn,this._evtActiveNode);
+        Emitter.instance.registerEvent(emitterName.activeValidateForm, this._evtActiveNode);
+        Emitter.instance.registerEvent(emitterName.isChecked, this._evtIsCheck);
     },
 
     isCheck(check){
@@ -28,7 +32,8 @@ cc.Class({
     },
 
     handleClick(){
-        Emitter.instance.emit("deleteItem");
+        Emitter.instance.emit(emitterName.deleteItem);
+        this._countCheck = 0;
     },
 
     hello(){

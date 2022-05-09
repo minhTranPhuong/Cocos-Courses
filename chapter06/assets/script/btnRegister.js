@@ -4,12 +4,14 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
+        _evtCheckForm:null,
     },
 
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        Emitter.instance.registerEvent("activeBtnRegister", this.checkForm.bind(this))
+        this._evtCheckForm = this.checkForm.bind(this)
+        Emitter.instance.registerEvent(emitterName.activeBtnRegister, this._evtCheckForm)
     },
 
     checkForm(value) {

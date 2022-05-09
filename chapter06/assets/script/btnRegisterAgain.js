@@ -4,10 +4,12 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
+        _evtActiveNode: null,
     },
 
     onLoad () {
-        Emitter.instance.registerEvent("activeBtn",this.activeNode.bind(this));
+        this._evtActiveNode = this.activeNode.bind(this);
+        Emitter.instance.registerEvent(emitterName.activeBtn,this._evtActiveNode);
     },
 
     activeNode(bool){
@@ -16,7 +18,7 @@ cc.Class({
 
     handleClick(){
         this.node.active = false;
-        Emitter.instance.emit("activeValidateForm")
+        Emitter.instance.emit(emitterName.activeValidateForm)
     },
 
     start () {

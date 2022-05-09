@@ -4,23 +4,25 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
+        _evtSendData: null,
     },
 
 
     onLoad () {
+        this._evtSendData = this.sendData;
     },
 
     start () {
-        Emitter.instance.emit("activeBtn", false);
+        Emitter.instance.emit(emitterName.activeBtn, false);
     },
 
     onEnable(){
-        Emitter.instance.registerEvent("submitForm", this.sendData)
+        Emitter.instance.registerEvent(emitterName.submitForm, this._evtSendData)
     },
 
     sendData(data, loginCom){
         loginCom.node.active = false;
-        Emitter.instance.emit("showListUser" , data , loginCom);
+        Emitter.instance.emit(emitterName.showListUser , data , loginCom);
     }
 
     // update (dt) {},
