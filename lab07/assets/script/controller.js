@@ -58,10 +58,11 @@ cc.Class({
     onKeyUp(e) {
         Emitter.instance.emit("keyUp")
         this._keys.delete(e.keyCode);
-        // for(const value of this._keys.values()){
-        //     this.onKeyDown(value)
-        //     return;
-        // }
+        for(const value of this._keys.values()){
+            if(this._keys.size > 1) return;
+            this.onKeyDown(value)
+            return;
+        }
     },
     onLoad() {
         this._keys = new Map();
