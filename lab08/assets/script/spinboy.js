@@ -17,12 +17,15 @@ cc.Class({
         loseTheeGame: cc.Component,
         reloadGame: cc.Component,
         animWin: cc.Component,
-        
         deathSound: {
             default: null,
             type: cc.AudioClip
         },
         shotSound: {
+            default: null,
+            type: cc.AudioClip
+        },
+        winSound: {
             default: null,
             type: cc.AudioClip
         },
@@ -67,29 +70,36 @@ cc.Class({
                 this._isJump = false;
                 this._isMove = false;
                 let actions = [cc.callFunc(() => {
+                    if (this._score == 1) {
+                        cc.log(this._isJump, this._isMove);
+                        this.loseGame();
+
+                    }
                     if (this._isDead) return;
                     if (this._isWin) return;
-                    if (this._score == 0) {
-                        this.loseGame();
-                        let actionSound = cc.callFunc(this.playSoundDeath, this);
-                        this.node.runAction(actionSound)
-                    }
+
                     this._score -= 1;
                 }),
-                cc.delayTime(0.05),
+                cc.delayTime(0.5),
                 cc.callFunc(() => {
                     let unit = this._score % 10;
                     this.score.string = `<color=#00ff00>${(this._score - this._score % 10) / 10}</c><color=#0fffff>${unit}</color>`
                 })];
                 this.node.runAction(cc.repeat(cc.sequence(actions), 99));
+
+                let manager = cc.director.getCollisionManager();
+                manager.enabled = true;
             }
         })
     },
     playSoundDeath() {
-        //cc.audioEngine.playEffect(this.deathSound, false);
+        cc.audioEngine.playEffect(this.deathSound, false);
     },
     playSoundShot() {
-        //cc.audioEngine.playEffect(this.shotSound, false);
+        cc.audioEngine.playEffect(this.shotSound, false);
+    },
+    playSoundWin() {
+        cc.audioEngine.playEffect(this.winSound, false);
     },
 
     registerEmitter() {
@@ -201,7 +211,6 @@ cc.Class({
     },
 
     handleMove(act) {
-        cc.log(this.spinboy)
         if (this._isJump) return;
         if (this._isMove == true) return;
         this._isMove = true;
@@ -212,10 +221,6 @@ cc.Class({
     },
 
     start() {
-        let manager = cc.director.getCollisionManager();
-        manager.enabled = true;
-        // manager.enabledDebugDraw = true;
-        //manager.enabledDrawBoundingBox = true;
     },
 
     update(dt) {
@@ -225,29 +230,39 @@ cc.Class({
     },
 
     onCollisionEnter(orther, self) {
-
-        cc.log(orther.node.name)// if name  = marginRight => win game
+        if (orther.name == "fire<BoxCollider>") {
+            let hp = this.hpProgressBar.getComponent(cc.ProgressBar);
+            hp.progress -= 0.01;
+            orther.node.destroy();
+        }
         if (orther.node.name == "marginRight") {
-            this._isWin = true;
-            this.spinboy.setAnimation(1, 'hoverboard', true)
             this.winGame();
+            this._isWin = true;
+            this.node.stopAction(this._action);
+            this.node.stopAction(this._actionCollider);
+            this.spinboy.setAnimation(1, 'hoverboard', true)
             return;
         }
-        if (orther.name.indexOf("margin") >= 0) {
+        if (orther.name.indexOf("margin") >= 0 && this.node.scaleX < 0) {
             this.node.stopAction(this._action);
             this.node.stopAction(this._actionCollider);
             return;
         }
         if (this._isDead == true) return;
         this.node.stopAction(this._actionCollider)
-        let action1 = cc.blink(1, 50);
+        this._actionHeart();
+    },
+
+    _actionHeart() {
+        let action1 = cc.blink(1, 20);
         let action2 = cc.tintTo(0.5, 255, 0, 0)
-        this._actionCollider = cc.spawn(action1, action2);
+        let action3 = cc.callFunc(() => { this.node.opacity = 255 })
+        this._actionCollider = cc.spawn(action1, action2, action3);
         this.node.runAction(this._actionCollider);
     },
 
     onCollisionStay(orther, self) {
-        if (orther.name.indexOf("margin") >= 0) {
+        if (orther.name.indexOf("margin") >= 0 && this.node.scaleX < 0) {
             this.node.stopAction(this._action);
             this.node.stopAction(this._actionCollider);
             return;
@@ -259,7 +274,9 @@ cc.Class({
             this._isDead = true;
             this.handleDead();
             this.loseGame();
+            return;
         }
+        this._actionHeart();
     },
 
     onCollisionExit(orther) {
@@ -277,27 +294,31 @@ cc.Class({
         this._isJump = true;
         this._isMove = true;
         let score = 0;
-        cc.log(this.winTheeGame.node.getChildByName("scoreWin").getComponent(cc.Label).string)
         let actions = [cc.callFunc(() => { score = score + 1 }),
         cc.delayTime(0.01),
         cc.callFunc(() => {
             this.winTheeGame.node.getChildByName("scoreWin").getComponent(cc.Label).string = score;
             cc.log(this.score.string);
-        })];
+        }),
+        cc.callFunc(this.playSoundWin, this)
+        ];
         this.node.runAction(cc.repeat(cc.sequence(actions), this._score));
-        this.reloadGame.node.active = true;
+        this.reloadGame.node.active = false;// lỗi reload
         this.animWin.node.active = true;
     },
 
     loseGame() {
         this.loseTheeGame.node.active = true;
-        this._isJump = true;
-        this._isMove = true;
-        this.reloadGame.node.active = true;
+        // this._isJump = true;
+        // this._isMove = true;
+        this.reloadGame.node.active = false;// lỗi reload 
+        let actionSound = cc.callFunc(this.playSoundDeath, this);
+        this.node.runAction(actionSound)
+        Emitter.instance.emit("gameOver");
     },
 
     resetGame() {
-        cc.game.restart();
+        cc.director.loadScene("game")
     }
 
 

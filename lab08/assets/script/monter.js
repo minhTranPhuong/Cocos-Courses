@@ -1,5 +1,4 @@
 
-
 cc.Class({
     extends: cc.Component,
 
@@ -7,10 +6,14 @@ cc.Class({
         hpMonterProgress: cc.Component,
         _actionCollider: null,
         _isDead: false,
+        bulletFire:cc.Prefab,
+        spineBoy: cc.Component,
         breakSound: {
             default: null,
             type: cc.AudioClip
         },
+        _intervalCreateFire:null,
+        marginRight:cc.Component,
     },
 
 
@@ -20,6 +23,19 @@ cc.Class({
 
     onLoad() {
         this._isDead = false;
+        this._intervalCreateFire = setInterval(() =>{
+            this.shootFire();
+        },2000)
+    },
+
+    shootFire(){
+        let item = cc.instantiate(this.bulletFire);
+        item.parent = this.node.parent;
+        item.x = this.node.x - 80;
+        item.y = this.node.y + 70;
+        let action = cc.moveTo(2,this.spineBoy.node.x , this.spineBoy.node.y);
+        item.runAction(action);
+        cc.log(this.spineBoy)
     },
 
     start() {
@@ -37,12 +53,15 @@ cc.Class({
             this.node.opacity = 255
             this.node.angle = -90;
             this._isDead = true;
+            clearInterval(this._intervalCreateFire);
+            this.marginRight.node.active = true;
             this.node.destroy();
         }
     },
 
     onCollisionStay() {
-        this.node.opacity = 255;
+        //this.node.opacity = 255;
+        this.bingo();
     },
 
     onCollisionExit() {

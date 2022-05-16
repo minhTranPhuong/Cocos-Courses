@@ -21,6 +21,10 @@ cc.Class({
         if(ortherCol.name == "monter<BoxCollider>"){
             this.node.destroy();
         }
+        if(ortherCol.name == "fire<BoxCollider>"){
+            ortherCol.node.destroy();
+            this.node.destroy();
+        }
     },
 
     update (dt) {

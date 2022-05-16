@@ -6,6 +6,7 @@
       true,
       true,
       null,
+      true,
       true
     ],
     [
@@ -22,12 +23,22 @@
       false,
       false,
       true,
+      false,
+      null,
+      true
+    ],
+    [
+      true,
+      false,
+      false,
+      false,
       false
     ],
     [
       true,
       false,
       false,
+      true,
       false,
       false
     ]
@@ -52,15 +63,16 @@
     "thorn",
     "monter",
     "bullet",
-    "margin"
+    "margin",
+    "fire"
   ],
-  "last-module-event-record-time": 0,
+  "last-module-event-record-time": 1652717962987,
   "simulator-orientation": false,
   "simulator-resolution": {
     "height": 640,
     "width": 960
   },
+  "start-scene": "current",
   "use-customize-simulator": true,
-  "use-project-simulator-setting": false,
-  "start-scene": "current"
+  "use-project-simulator-setting": false
 }
