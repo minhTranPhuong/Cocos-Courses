@@ -12,17 +12,36 @@ cc.Class({
         spinboy: sp.Skeleton,
         hpProgressBar: cc.Component,
         prefabBullet: cc.Prefab,
-        _isMove: false,
-        _isJump: false,
+        score: cc.Component,
+        winTheeGame: cc.Component,
+        loseTheeGame: cc.Component,
+        reloadGame: cc.Component,
+        animWin: cc.Component,
+        
+        deathSound: {
+            default: null,
+            type: cc.AudioClip
+        },
+        shotSound: {
+            default: null,
+            type: cc.AudioClip
+        },
+        _isMove: true,
+        _isJump: true,
         _scaleX: 0,
         _worldX: 0,
         _worldY: 0,
         _actionCollider: null,
         _isDead: false,
+        _isWin: false,
+        _score: 0
     },
 
     onLoad() {
-
+        this._isMove = true;
+        this._isJump = true;
+        this._isWin = false;
+        this._score = 99;
         var fl = cc.follow(this.hpProgressBar.node, cc.rect(0, 0, 300, 15));
         this.node.runAction(fl)
 
@@ -39,6 +58,38 @@ cc.Class({
         this.spinboy.setMix('jump', "shoot", 0.1);
         this.spinboy.setMix('jump', "death", 0.1);
         this.spinboy.setMix('run', "death", 0.1);
+        this.spinboy.setMix('jump', "hoverboard", 0.3);
+        this.spinboy.setMix('run', "hoverboard", 0.3);
+
+
+        this.spinboy.setCompleteListener((vl) => {
+            if (vl.animationEnd >= 3.59) {
+                this._isJump = false;
+                this._isMove = false;
+                let actions = [cc.callFunc(() => {
+                    if (this._isDead) return;
+                    if (this._isWin) return;
+                    if (this._score == 0) {
+                        this.loseGame();
+                        let actionSound = cc.callFunc(this.playSoundDeath, this);
+                        this.node.runAction(actionSound)
+                    }
+                    this._score -= 1;
+                }),
+                cc.delayTime(0.05),
+                cc.callFunc(() => {
+                    let unit = this._score % 10;
+                    this.score.string = `<color=#00ff00>${(this._score - this._score % 10) / 10}</c><color=#0fffff>${unit}</color>`
+                })];
+                this.node.runAction(cc.repeat(cc.sequence(actions), 99));
+            }
+        })
+    },
+    playSoundDeath() {
+        //cc.audioEngine.playEffect(this.deathSound, false);
+    },
+    playSoundShot() {
+        //cc.audioEngine.playEffect(this.shotSound, false);
     },
 
     registerEmitter() {
@@ -59,6 +110,8 @@ cc.Class({
     },
 
     handleShoot() {
+        if (this._isWin) return;
+        this.spinboy.setAnimation(1, 'shoot', false);
         let item = cc.instantiate(this.prefabBullet);
         item.parent = this.node;
         let direction = 1;
@@ -66,8 +119,10 @@ cc.Class({
             direction = -1;
         }
         item.getComponent("bullet").direction = direction;
-        item.y = this.node.y / 2 + this._worldY;
-        item.x = this.node.x + this._worldX;
+        item.y = this.node.y / 2 + this._worldY - 100;
+        item.x = this.node.x + this._worldX + 200;
+        let actionSound = cc.callFunc(this.playSoundShot, this);
+        this.node.runAction(actionSound)
     },
 
     handleDontJump() {
@@ -79,7 +134,8 @@ cc.Class({
                 } else {
                     this.spinboy.setToSetupPose();
                     this.spinboy.setAnimation(0, 'idle', false);
-                    this.node.stopAllActions();
+                    this.node.stopAction(this._action);
+                    this.node.stopAction(this._actionCollider);
                 }
             }
         });
@@ -89,17 +145,20 @@ cc.Class({
         if (this._isJump == true) return;
         this._isJump = true;
         this.spinboy.setAnimation(0, 'jump', true);
+
     },
 
     handleDontMove() {
         if (this._isJump == true) {
             this._isMove = false;
             this.spinboy.setEventListener((vl1) => {
-                if (vl1.animationEnd >= 1.3) {
+                this._isJump = false;
+                if (vl1.animationEnd >= 1) { //1.3) {
                     this.spinboy.setToSetupPose();
                     this.spinboy.setAnimation(0, 'idle', false);
-                    this._isJump = false;
-                    this.node.stopAllActions();
+                    //this._isJump = false;
+                    this.node.stopAction(this._action);
+                    this.node.stopAction(this._actionCollider);
                 }
             })
         }
@@ -108,12 +167,13 @@ cc.Class({
             this.spinboy.setAnimation(0, 'idle', false);
             this._isMove = false;
             this._isJump = false;
-            this.node.stopAllActions();
+            this.node.stopAction(this._action);
+            this.node.stopAction(this._actionCollider);
         }
     },
 
     handleDead() {
-        
+
         this._isMove = true;
         this._isJump = true;
         this.spinboy.setCompleteListener((vl) => {
@@ -141,21 +201,21 @@ cc.Class({
     },
 
     handleMove(act) {
-        cc.log(act)
+        cc.log(this.spinboy)
         if (this._isJump) return;
         if (this._isMove == true) return;
         this._isMove = true;
         this.spinboy.setAnimation(0, 'run', true);
         let turn = this.spinBoyTurn(act);
-        this._action = cc.moveBy(0.8, cc.v2(turn * 100, 0)).repeatForever();
+        this._action = cc.moveBy(0.8, cc.v2(turn * 300, 0)).repeatForever();
         this.node.runAction(this._action);
     },
 
     start() {
         let manager = cc.director.getCollisionManager();
         manager.enabled = true;
-        manager.enabledDebugDraw = true;
-        manager.enabledDrawBoundingBox = true;
+        // manager.enabledDebugDraw = true;
+        //manager.enabledDrawBoundingBox = true;
     },
 
     update(dt) {
@@ -164,12 +224,21 @@ cc.Class({
         this.node.getComponent(cc.BoxCollider).offset = cc.v2(this._worldX, this._worldY);
     },
 
-    onCollisionEnter(orther,self) {
-        if(orther.name.indexOf("margin") >= 0){
-            this.node.stopAllActions();
+    onCollisionEnter(orther, self) {
+
+        cc.log(orther.node.name)// if name  = marginRight => win game
+        if (orther.node.name == "marginRight") {
+            this._isWin = true;
+            this.spinboy.setAnimation(1, 'hoverboard', true)
+            this.winGame();
             return;
         }
-        if(this._isDead == true) return;
+        if (orther.name.indexOf("margin") >= 0) {
+            this.node.stopAction(this._action);
+            this.node.stopAction(this._actionCollider);
+            return;
+        }
+        if (this._isDead == true) return;
         this.node.stopAction(this._actionCollider)
         let action1 = cc.blink(1, 50);
         let action2 = cc.tintTo(0.5, 255, 0, 0)
@@ -178,8 +247,9 @@ cc.Class({
     },
 
     onCollisionStay(orther, self) {
-        if(orther.name.indexOf("margin") >= 0){
-            this.node.stopAllActions();
+        if (orther.name.indexOf("margin") >= 0) {
+            this.node.stopAction(this._action);
+            this.node.stopAction(this._actionCollider);
             return;
         }
         let hp = this.hpProgressBar.getComponent(cc.ProgressBar);
@@ -188,16 +258,48 @@ cc.Class({
             cc.log(1);
             this._isDead = true;
             this.handleDead();
+            this.loseGame();
         }
     },
 
     onCollisionExit(orther) {
-        if(orther.name.indexOf("margin") >= 0){
+        if (orther.name.indexOf("margin") >= 0) {
             return;
         }
         this.node.opacity = 255;
         this.node.stopAction(this._actionCollider);
         this._actionCollider = cc.tintTo(1, 255, 255, 255)
         this.node.runAction(this._actionCollider);
+    },
+
+    winGame() {
+        this.winTheeGame.node.active = true;
+        this._isJump = true;
+        this._isMove = true;
+        let score = 0;
+        cc.log(this.winTheeGame.node.getChildByName("scoreWin").getComponent(cc.Label).string)
+        let actions = [cc.callFunc(() => { score = score + 1 }),
+        cc.delayTime(0.01),
+        cc.callFunc(() => {
+            this.winTheeGame.node.getChildByName("scoreWin").getComponent(cc.Label).string = score;
+            cc.log(this.score.string);
+        })];
+        this.node.runAction(cc.repeat(cc.sequence(actions), this._score));
+        this.reloadGame.node.active = true;
+        this.animWin.node.active = true;
+    },
+
+    loseGame() {
+        this.loseTheeGame.node.active = true;
+        this._isJump = true;
+        this._isMove = true;
+        this.reloadGame.node.active = true;
+    },
+
+    resetGame() {
+        cc.game.restart();
     }
+
+
 });
+// clound, bullet monterss 
